@@ -1,0 +1,423 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    /* ---------------------------------------------------------------------
+     * Theme tokens (RGB channels). Light values live on :root; dark values
+     * override them when the `dark` class is present on <html>. Because every
+     * semantic Tailwind color above references these variables, the whole UI
+     * re-themes instantly with a single class toggle.
+     * ------------------------------------------------------------------- */
+    :root {
+        color-scheme: light;
+
+        /* Brand */
+        --brand: 49 87 213;
+        --brand-hover: 37 70 181;
+        --brand-subtle: 238 242 255;
+        --brand-50: 240 244 255;
+        --brand-100: 224 231 255;
+
+        /* Surfaces */
+        --surface: 255 255 255;
+        --surface-card: 255 255 255;
+        --surface-subtle: 248 249 252;
+        --surface-muted: 241 243 249;
+        --surface-sunken: 238 241 247;
+        --canvas: 248 249 252;
+
+        /* Ink */
+        --ink-primary: 23 26 36;
+        --ink-secondary: 100 107 122;
+        --ink-muted: 138 144 160;
+        --ink-light: 195 199 212;
+        --ink-inverse: 255 255 255;
+
+        /* Borders */
+        --border-default: 229 232 239;
+        --border-subtle: 238 240 245;
+        --border-strong: 208 213 221;
+
+        /* Accents */
+        --accent-success: 22 132 91;
+        --accent-success-subtle: 232 246 239;
+        --accent-success-strong: 15 107 73;
+        --accent-warning: 183 121 31;
+        --accent-warning-subtle: 254 248 236;
+        --accent-warning-strong: 150 98 15;
+        --accent-danger: 200 62 77;
+        --accent-danger-subtle: 253 235 236;
+        --accent-danger-strong: 167 46 60;
+        --accent-info: 36 112 199;
+        --accent-info-subtle: 234 243 253;
+        --accent-info-strong: 27 90 160;
+
+        /* Foreground for solid brand/accent fills */
+        --accent-contrast: 255 255 255;
+
+        /* Sidebar (constant dark in both themes) */
+        --sidebar: 15 19 29;
+
+        /* Skeleton shimmer highlight */
+        --skeleton-shine: rgba(255, 255, 255, 0.6);
+    }
+
+    .dark {
+        color-scheme: dark;
+
+        --brand: 122 150 255;
+        --brand-hover: 150 173 255;
+        --brand-subtle: 32 41 70;
+        --brand-50: 28 35 60;
+        --brand-100: 38 49 84;
+
+        --surface: 23 28 39;
+        --surface-card: 23 28 39;
+        --surface-subtle: 19 23 33;
+        --surface-muted: 33 40 54;
+        --surface-sunken: 15 19 28;
+        --canvas: 12 15 22;
+
+        --ink-primary: 234 237 245;
+        --ink-secondary: 165 172 188;
+        --ink-muted: 138 146 165;
+        --ink-light: 95 103 122;
+        --ink-inverse: 15 19 29;
+
+        --border-default: 47 55 74;
+        --border-subtle: 39 46 62;
+        --border-strong: 66 76 99;
+
+        --accent-success: 74 201 148;
+        --accent-success-subtle: 24 48 40;
+        --accent-success-strong: 134 224 181;
+        --accent-warning: 226 178 92;
+        --accent-warning-subtle: 56 46 27;
+        --accent-warning-strong: 240 205 140;
+        --accent-danger: 240 130 137;
+        --accent-danger-subtle: 62 34 39;
+        --accent-danger-strong: 250 170 175;
+        --accent-info: 122 178 240;
+        --accent-info-subtle: 27 44 68;
+        --accent-info-strong: 160 200 245;
+
+        --accent-contrast: 15 19 29;
+
+        --skeleton-shine: rgba(148, 163, 184, 0.12);
+    }
+
+    * {
+        border-color: rgb(var(--border-default));
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        background-color: rgb(var(--canvas));
+        color: rgb(var(--ink-primary));
+        font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
+        letter-spacing: -0.02em;
+    }
+
+    ::selection {
+        background-color: rgb(var(--brand));
+        color: #fff;
+    }
+
+    :focus-visible {
+        outline: none;
+    }
+
+    /* Accessible focus ring shared by all interactive elements */
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    [tabindex]:focus-visible,
+    [role="button"]:focus-visible {
+        outline: 2px solid rgb(var(--brand));
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+
+    /* Respect users who prefer reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+        html {
+            scroll-behavior: auto;
+        }
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+        }
+    }
+}
+
+@layer components {
+    /* ---------------------------------------------------------------- Layout */
+    .container-page {
+        @apply max-w-content mx-auto px-4 sm:px-6 lg:px-8;
+    }
+
+    .container-narrow {
+        @apply max-w-2xl mx-auto px-4 sm:px-6;
+    }
+
+    .section-pad {
+        @apply py-14 sm:py-20;
+    }
+
+    .card {
+        @apply bg-surface border border-border rounded-2xl shadow-card;
+    }
+
+    .card-interactive {
+        @apply card transition-all duration-200 hover:shadow-card-hover hover:border-brand/40;
+    }
+
+    .surface-card {
+        @apply bg-surface border border-border rounded-xl shadow-card;
+    }
+
+    /* ----------------------------------------------------------- Buttons */
+    .btn {
+        @apply inline-flex items-center justify-center font-medium select-none transition-all duration-150 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap;
+    }
+
+    .btn-primary {
+        @apply btn bg-brand text-accent-contrast hover:bg-brand-hover focus:ring-brand shadow-subtle rounded-lg px-4 py-2 text-sm font-semibold active:scale-[0.98];
+    }
+
+    .btn-secondary {
+        @apply btn bg-surface text-ink-primary border border-border hover:bg-surface-subtle hover:text-ink-primary focus:ring-brand/30 shadow-subtle rounded-lg px-4 py-2 text-sm font-medium;
+    }
+
+    .btn-subtle {
+        @apply btn bg-brand-subtle text-brand hover:bg-brand-100 focus:ring-brand rounded-lg px-3 py-1.5 text-xs font-semibold;
+    }
+
+    .btn-ghost {
+        @apply btn bg-transparent text-ink-secondary hover:text-ink-primary hover:bg-surface-muted focus:ring-brand/20 rounded-lg px-3 py-1.5 text-sm font-medium;
+    }
+
+    .btn-danger {
+        @apply btn bg-accent-danger text-accent-contrast hover:brightness-95 focus:ring-accent-danger rounded-lg px-3 py-1.5 text-xs font-semibold;
+    }
+
+    .btn-success {
+        @apply btn bg-accent-success text-accent-contrast hover:brightness-95 focus:ring-accent-success rounded-lg px-3 py-1.5 text-xs font-semibold;
+    }
+
+    .btn-danger-outline {
+        @apply btn bg-surface text-accent-danger border border-accent-danger/30 hover:bg-accent-danger-subtle focus:ring-accent-danger/30 rounded-lg px-3 py-1.5 text-xs font-semibold;
+    }
+
+    .btn-icon {
+        @apply btn w-9 h-9 rounded-lg text-ink-secondary hover:text-ink-primary hover:bg-surface-muted focus:ring-brand/30;
+    }
+
+    .btn-lg {
+        @apply px-5 py-2.5 text-sm rounded-xl;
+    }
+
+    .btn-sm {
+        @apply px-3 py-1.5 text-xs rounded-lg;
+    }
+
+    /* ------------------------------------------------------- Feedback */
+    .alert {
+        @apply flex items-start gap-3 rounded-xl border px-4 py-3 text-sm;
+    }
+
+    .alert-success {
+        @apply alert bg-accent-success-subtle border-accent-success/25 text-accent-success-strong;
+    }
+
+    .alert-warning {
+        @apply alert bg-accent-warning-subtle border-accent-warning/25 text-accent-warning-strong;
+    }
+
+    .alert-danger {
+        @apply alert bg-accent-danger-subtle border-accent-danger/25 text-accent-danger-strong;
+    }
+
+    .alert-info {
+        @apply alert bg-accent-info-subtle border-accent-info/25 text-accent-info-strong;
+    }
+
+    .toast {
+        @apply inline-flex items-center gap-3 rounded-xl border bg-surface shadow-dropdown px-4 py-3 text-sm font-medium text-ink-primary;
+    }
+
+    .empty-state {
+        @apply flex flex-col items-center justify-center text-center rounded-2xl border border-dashed border-border bg-surface px-6 py-14;
+    }
+
+    /* -------------------------------------------------------- Form fields */
+    .field {
+        @apply space-y-1.5;
+    }
+
+    .field-label {
+        @apply block text-sm font-medium text-ink-secondary;
+    }
+
+    .field-hint {
+        @apply text-xs text-ink-muted;
+    }
+
+    .field-error {
+        @apply text-xs font-medium text-accent-danger mt-1.5;
+    }
+
+    .field-control {
+        @apply w-full rounded-lg border border-border bg-surface text-ink-primary placeholder:text-ink-muted shadow-subtle px-3.5 py-2.5 text-sm transition-colors duration-150;
+    }
+
+    .field-control:focus,
+    .field-control:focus-within {
+        @apply border-brand outline-none ring-1 ring-brand;
+    }
+
+    .field-control:disabled {
+        @apply bg-surface-muted text-ink-muted cursor-not-allowed;
+    }
+
+    .field-invalid {
+        @apply border-accent-danger focus:border-accent-danger focus:ring-accent-danger;
+    }
+
+    /* ------------------------------------------------------------ Badges */
+    .badge {
+        @apply inline-flex items-center gap-1.5 rounded-full text-xs font-medium;
+    }
+
+    .badge-neutral {
+        @apply badge bg-surface-muted text-ink-secondary border border-border px-2.5 py-1;
+    }
+
+    .badge-brand {
+        @apply badge bg-brand-subtle text-brand border border-brand/20 px-2.5 py-1;
+    }
+
+    .badge-success {
+        @apply badge bg-accent-success-subtle text-accent-success-strong border border-accent-success/25 px-2.5 py-1;
+    }
+
+    .badge-warning {
+        @apply badge bg-accent-warning-subtle text-accent-warning-strong border border-accent-warning/25 px-2.5 py-1;
+    }
+
+    .badge-danger {
+        @apply badge bg-accent-danger-subtle text-accent-danger-strong border border-accent-danger/25 px-2.5 py-1;
+    }
+
+    .badge-info {
+        @apply badge bg-accent-info-subtle text-accent-info-strong border border-accent-info/25 px-2.5 py-1;
+    }
+
+    /* --------------------------------------------------------- Content */
+    .prose-content {
+        @apply text-body text-ink-secondary leading-relaxed;
+    }
+
+    .prose-content h2 {
+        @apply text-heading-section font-bold text-ink-primary mt-8 mb-3;
+    }
+
+    .prose-content h3 {
+        @apply text-heading-card font-bold text-ink-primary mt-6 mb-2;
+    }
+
+    .prose-content p {
+        @apply mt-3;
+    }
+
+    .prose-content ul {
+        @apply mt-3 space-y-1.5 list-disc pl-5;
+    }
+
+    .prose-content ol {
+        @apply mt-3 space-y-1.5 list-decimal pl-5;
+    }
+
+    .prose-content a {
+        @apply text-brand underline underline-offset-2 hover:text-brand-hover;
+    }
+
+    .prose-content strong {
+        @apply font-semibold text-ink-primary;
+    }
+
+    /* ------------------------------------------------------ Skeletons */
+    .skeleton {
+        @apply relative overflow-hidden rounded-lg bg-surface-muted;
+    }
+
+    .skeleton::after {
+        content: '';
+        @apply absolute inset-0 -translate-x-full;
+        background-image: linear-gradient(
+            90deg,
+            transparent 0,
+            var(--skeleton-shine) 50%,
+            transparent 100%
+        );
+        animation: shimmer 1.6s infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .skeleton::after {
+            animation: none;
+        }
+    }
+
+    /* ------------------------------------------------- Misc utilities */
+    .link-brand {
+        @apply font-medium text-brand hover:text-brand-hover underline-offset-2 hover:underline;
+    }
+
+    .divider {
+        @apply border-t border-border;
+    }
+
+    .code {
+        @apply font-mono text-xs bg-surface-muted border border-border rounded px-1.5 py-0.5;
+    }
+}
+
+@layer utilities {
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .tabular-nums {
+        font-variant-numeric: tabular-nums;
+    }
+}
