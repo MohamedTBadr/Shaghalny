@@ -35,29 +35,6 @@ data and scored (0–100) against each vacancy by GPT-4o, with detailed recruite
 The UI is a custom design system (Tailwind tokens + reusable Blade components) with a full
 **light/dark theme** and a persisted theme toggle.
 
----
-
-## Portfolio / CV summary
-
-> **One-liner:** A full-stack Laravel job board and applicant-tracking platform with AI résumé
-> parsing and match scoring, featuring separate candidate, employer and admin experiences.
-
-**Short description (2–3 sentences):**
-> Shaghalny is a full-stack recruitment platform I built with Laravel 12, Blade, Tailwind CSS and
-> Alpine.js. It serves three distinct user roles — job seekers, company owners and admins — through a
-> public job board, a candidate workspace and a back-office ATS, with AI-powered résumé parsing and
-> candidate-to-job match scoring via the OpenAI API. The app uses UUID keys, soft deletes, a
-> role-based middleware guard, and a token-driven design system with dark mode.
-
-**Highlights to list on a CV / portfolio:**
-- Designed and built a unified job board + ATS supporting **3 roles with role-based access control**.
-- Integrated **OpenAI GPT-4o** to parse PDF résumés and generate **0–100 suitability scores + feedback**.
-- Built a **custom design system** (Tailwind tokens, ~35 Blade components) with **dark mode**.
-- Implemented full **CRUD + soft-delete/restore** for companies, users, categories, vacancies and applications.
-- Added **search & multi-facet filtering**, saved jobs, résumé management, and an analytics dashboard.
-- Architected with **Laravel 12** conventions: form requests, service layer, middleware, UUIDs, seeders.
-
-**Tech tags:** `Laravel` `PHP` `MySQL` `Blade` `Tailwind CSS` `Alpine.js` `Vite` `OpenAI API` `AWS S3` `REST/MVC`
 
 ---
 
