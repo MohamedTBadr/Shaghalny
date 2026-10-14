@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\ApplicationStatusHistory;
 use App\Models\JobApplication;
+use App\Support\SystemLog;
 use Illuminate\Http\Request;
+use Throwable;
 
 class JobApplicationController extends Controller
 {
@@ -36,6 +38,7 @@ class JobApplicationController extends Controller
             if (auth()->user()->role === 'company_owner') {
                 $q->whereHas('jobVacancy', fn ($jq) => $jq->where('Company_id', auth()->user()->company->id));
             }
+
             return $q;
         };
 
@@ -95,6 +98,19 @@ class JobApplicationController extends Controller
         }
 
         $app->save();
+
+        try {
+            SystemLog::info('Applicant record updated', [
+                'context' => [
+                    'id' => $app->id,
+                    'status' => $validated['status'],
+                    'previous_status' => $previous,
+                    'fields' => array_keys($validated),
+                ],
+            ]);
+        } catch (Throwable) {
+            // never break the request because of logging
+        }
 
         return redirect()->route('job-application.index')->with('success', 'Application updated successfully.');
     }

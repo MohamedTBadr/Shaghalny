@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CandidateJobApplicationController;
 use App\Http\Controllers\CandidateJobVacancyController;
 use App\Http\Controllers\CandidateProfileController;
@@ -8,10 +7,12 @@ use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\CompaniesController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\JobCategoryController;
 use App\Http\Controllers\JobSearchController;
 use App\Http\Controllers\JobVacancyController;
+use App\Http\Controllers\LogWebController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ResumeController;
@@ -50,6 +51,11 @@ Route::get('/terms', [PageController::class, 'terms'])->name('pages.terms');
 Route::middleware(['auth'])->group(function () {
     // Role-Adaptive Dashboard (shows Job Board for job_seeker, Analytics for admin & company_owner)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Structured application log viewer (admin only)
+    Route::get('/logs', [LogWebController::class, 'index'])
+        ->middleware('role:admin')
+        ->name('logs.index');
 
     // Profile Management
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -98,7 +104,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/jobs/{job}/save', [SavedJobController::class, 'store'])->name('saved-jobs.store');
     Route::delete('/jobs/{job}/save', [SavedJobController::class, 'destroy'])->name('saved-jobs.destroy');
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -149,4 +154,4 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/job-category/restore/{id}', [JobCategoryController::class, 'restore'])->name('job-category.restore');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

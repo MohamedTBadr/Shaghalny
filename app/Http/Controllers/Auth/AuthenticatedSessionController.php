@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Support\SystemLog;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Throwable;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -28,6 +30,19 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        try {
+            $user = $request->user();
+            SystemLog::info('User logged in', [
+                'user' => $user?->name ?? $user?->email,
+                'context' => [
+                    'role' => $user?->role,
+                    'email' => $user?->email,
+                ],
+            ]);
+        } catch (Throwable) {
+            // never break login because of logging
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
@@ -36,6 +51,16 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $user = Auth::user();
+
+        try {
+            SystemLog::info('User logged out', [
+                'user' => $user?->name ?? $user?->email,
+            ]);
+        } catch (Throwable) {
+            // never break logout because of logging
+        }
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

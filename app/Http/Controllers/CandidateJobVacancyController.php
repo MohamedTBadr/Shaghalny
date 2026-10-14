@@ -8,6 +8,8 @@ use App\Models\JobApplication;
 use App\Models\JobVacancy;
 use App\Models\Resume;
 use App\Services\ResumeAnalysisService;
+use App\Support\SystemLog;
+use Throwable;
 
 class CandidateJobVacancyController extends Controller
 {
@@ -125,6 +127,19 @@ class CandidateJobVacancyController extends Controller
             'note' => 'Application submitted',
             'changed_by_role' => 'candidate',
         ]);
+
+        try {
+            SystemLog::info('New job application submitted', [
+                'context' => [
+                    'application_id' => $application->id,
+                    'job_id' => $id,
+                    'job_title' => $jobVacancy->title,
+                    'candidate' => auth()->user()->name,
+                ],
+            ]);
+        } catch (Throwable) {
+            // never break the request because of logging
+        }
 
         return redirect()->route('job-applications.index')->with('success', 'Applied successfully');
     }

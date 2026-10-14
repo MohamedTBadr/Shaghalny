@@ -1,5 +1,6 @@
 <?php
 
+use App\Logging\SystemLogFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -62,6 +63,23 @@ return [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+        ],
+
+        /*
+         * Dedicated, structured application log.
+         *
+         * Writes one JSON object per line (fixed structure, see
+         * App\Logging\SystemLogFormatter) to storage/logs/system-YYYY-MM-DD.log
+         * so the "System Logs" viewer can render every entry reliably.
+         */
+        'system' => [
+            'driver' => 'daily',
+            'name' => 'system',
+            'path' => storage_path('logs/system.log'),
+            'level' => env('LOG_SYSTEM_LEVEL', 'debug'),
+            'days' => env('LOG_SYSTEM_DAYS', 30),
+            'formatter' => SystemLogFormatter::class,
             'replace_placeholders' => true,
         ],
 
