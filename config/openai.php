@@ -17,6 +17,16 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Chat Model
+    |--------------------------------------------------------------------------
+    |
+    | The default chat completion model used by the resume analysis service.
+    | Works with any OpenAI-compatible provider (e.g. Groq).
+    */
+    'model' => env('OPENAI_MODEL', 'openai/gpt-oss-120b'),
+
+    /*
+    |--------------------------------------------------------------------------
     | OpenAI API Project
     |--------------------------------------------------------------------------
     |

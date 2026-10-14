@@ -7,7 +7,6 @@ use App\Services\ResumeAnalysisService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 
 class ResumeController extends Controller
 {
@@ -40,9 +39,9 @@ class ResumeController extends Controller
         $file = $validated['resume_file'];
         $originalName = $file->getClientOriginalName();
         $extension = $file->getClientOriginalExtension();
-        $storedName = 'resume_' . uniqid() . '.' . $extension;
+        $storedName = 'resume_'.uniqid().'.'.$extension;
 
-        $path = $file->storeAs('resumes', $storedName, 'cloud');
+        $path = $file->storeAs('resumes', $storedName, 'local');
         $fileUrl = $path;
 
         $extracted = $this->resumeAnalysisService->extractResumeInfromation($fileUrl);
@@ -72,7 +71,7 @@ class ResumeController extends Controller
         abort_if($resume->trashed(), 404);
         abort_unless($resume->user_id === $request->user()->id, 403);
 
-        return Storage::disk('cloud')->download(
+        return Storage::disk('local')->download(
             $resume->fileUrl,
             $resume->file_name
         );
@@ -86,9 +85,9 @@ class ResumeController extends Controller
         abort_unless($resume->user_id === $request->user()->id, 403);
 
         try {
-            Storage::disk('cloud')->delete($resume->fileUrl);
+            Storage::disk('local')->delete($resume->fileUrl);
         } catch (\Exception $e) {
-            Log::warning('Failed to delete resume file ' . $resume->id . ': ' . $e->getMessage());
+            Log::warning('Failed to delete resume file '.$resume->id.': '.$e->getMessage());
         }
 
         $resume->delete();

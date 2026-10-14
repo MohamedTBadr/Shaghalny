@@ -46,18 +46,18 @@ The UI is a custom design system (Tailwind tokens + reusable Blade components) w
 > Shaghalny is a full-stack recruitment platform I built with Laravel 12, Blade, Tailwind CSS and
 > Alpine.js. It serves three distinct user roles — job seekers, company owners and admins — through a
 > public job board, a candidate workspace and a back-office ATS, with AI-powered résumé parsing and
-> candidate-to-job match scoring via the OpenAI API. The app uses UUID keys, soft deletes, a
+> candidate-to-job match scoring via the OpenAI-compatible Groq API. The app uses UUID keys, soft deletes, a
 > role-based middleware guard, and a token-driven design system with dark mode.
 
 **Highlights to list on a CV / portfolio:**
 - Designed and built a unified job board + ATS supporting **3 roles with role-based access control**.
-- Integrated **OpenAI GPT-4o** to parse PDF résumés and generate **0–100 suitability scores + feedback**.
+- Integrated the **Groq API** (OpenAI-compatible) to parse PDF résumés and generate **0–100 suitability scores + feedback**.
 - Built a **custom design system** (Tailwind tokens, ~35 Blade components) with **dark mode**.
 - Implemented full **CRUD + soft-delete/restore** for companies, users, categories, vacancies and applications.
 - Added **search & multi-facet filtering**, saved jobs, résumé management, and an analytics dashboard.
 - Architected with **Laravel 12** conventions: form requests, service layer, middleware, UUIDs, seeders.
 
-**Tech tags:** `Laravel` `PHP` `MySQL` `Blade` `Tailwind CSS` `Alpine.js` `Vite` `OpenAI API` `AWS S3` `REST/MVC`
+**Tech tags:** `Laravel` `PHP` `MySQL` `Blade` `Tailwind CSS` `Alpine.js` `Vite` `Groq API` `Socialite (Google OAuth)` `REST/MVC`
 
 ---
 
@@ -102,8 +102,8 @@ The UI is a custom design system (Tailwind tokens + reusable Blade components) w
 | Frontend         | Blade templates, Tailwind CSS 3, Alpine.js 3 |
 | Build            | Vite 6, PostCSS, Autoprefixer |
 | Database         | MySQL / MariaDB (in production), SQLite (local default) |
-| Files / storage  | Laravel filesystem — local or **AWS S3** (`league/flysystem-aws-s3-v3`) |
-| AI               | **OpenAI PHP for Laravel** (`gpt-4o`) |
+| Files / storage  | Laravel filesystem — application local disk (`storage/app`) |
+| AI               | **Groq API** via `openai-php/laravel` (OpenAI-compatible, `openai/gpt-oss-120b`) |
 | PDF parsing      | `spatie/pdf-to-text` (wraps the `pdftotext` binary) |
 | Testing          | Pest PHP 3 (PHPUnit under the hood) |
 | Code style       | Laravel Pint |
@@ -132,18 +132,20 @@ The `users.role` enum has three values, enforced by the `role` middleware alias
 
 Implemented in `app/Services/ResumeAnalysisService.php`:
 
-1. **Extract** — the résumé PDF is streamed from the configured *cloud* disk to a temp file and
+1. **Extract** — the résumé PDF is read from the application's local disk to a temp file and
    converted to text with the `pdftotext` binary.
-2. **Parse** — the raw text is sent to **OpenAI `gpt-4o`** with a strict JSON schema and returns
+2. **Parse** — the raw text is sent to the **Groq chat completions API** (`openai/gpt-oss-120b`,
+   OpenAI-compatible) in JSON mode and returns
    structured `summary`, `skills`, `experience` and `education`.
 3. **Score** — the parsed résumé plus the vacancy details are sent to GPT-4o, returning
    `AI_Generated_score` (0–100) and `AI_Generated_feedback` (detailed recruiter feedback),
    stored on the `job_applications` record.
 
-The service **fails gracefully**: if the OpenAI key is missing, the PDF tool isn't installed, or an
+The service **fails gracefully**: if the Groq API key is missing, the PDF tool isn't installed, or an
 API error occurs, it logs the error and returns empty/zero values instead of breaking the request.
 
-**Requirements for AI analysis:** a valid `OPENAI_API_KEY` and the `pdftotext` binary available on
+**Requirements for AI analysis:** a valid Groq API key (`OPENAI_API_KEY`, with
+`OPENAI_BASE_URL=https://api.groq.com/openai/v1`) and the `pdftotext` binary available on
 the host (`poppler-utils` on Debian/Ubuntu).
 
 ---
@@ -214,7 +216,7 @@ resources/
 - Composer 2
 - Node.js 18+ and npm
 - A database (SQLite by default; MySQL/MariaDB supported)
-- Optional: `pdftotext` (`poppler-utils`) for résumé parsing, and an OpenAI API key
+- Optional: `pdftotext` (`poppler-utils`) for résumé parsing, and a Groq API key
 
 ### Installation
 
@@ -266,22 +268,23 @@ DB_CONNECTION=sqlite
 # DB_USERNAME=root
 # DB_PASSWORD=
 
-# --- File storage: local or S3 ---
+# --- File storage ---
 FILESYSTEM_DISK=local
-FILESYSTEM_CLOUD_DISK=local          # set to "s3" to store résumés on AWS S3
 
-# --- AWS S3 (when FILESYSTEM_CLOUD_DISK=s3) ---
+# --- AWS S3 (only if you switch FILESYSTEM_DISK to s3) ---
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
 AWS_DEFAULT_REGION=us-east-1
 AWS_BUCKET=
 
-# --- OpenAI (résumé parsing & scoring) ---
+# --- Groq (résumé parsing & scoring, OpenAI-compatible) ---
 OPENAI_API_KEY=
+OPENAI_BASE_URL=https://api.groq.com/openai/v1
+OPENAI_MODEL=openai/gpt-oss-120b
 ```
 
-> Résumé files are written to and read from the **cloud** disk (`FILESYSTEM_CLOUD_DISK`). For local
-> development set it to `local`; for production point it at S3.
+> Résumé files are written to and read from the application's **local** disk
+> (`storage/app/private`).
 
 ---
 
@@ -337,7 +340,7 @@ npm run build             # production asset build
 
 ## Notes & limitations
 
-- AI features require an `OPENAI_API_KEY` and `pdftotext`; otherwise they degrade gracefully.
+- AI features require a Groq API key (`OPENAI_API_KEY`) and `pdftotext`; otherwise they degrade gracefully.
 - Résumé uploads are PDF-only for meaningful text extraction.
 - New registrations are always `job_seeker`; owner/admin accounts are seeded or admin-created.
 - If you run migrations against a **load-balanced / serverless MySQL proxy**, ensure the connection
