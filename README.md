@@ -281,6 +281,9 @@ AWS_BUCKET=
 OPENAI_API_KEY=
 OPENAI_BASE_URL=https://api.groq.com/openai/v1
 OPENAI_MODEL=openai/gpt-oss-120b
+
+# --- PDF text extraction (optional path override; auto-detected by default) ---
+PDFTOTEXT_BINARY=
 ```
 
 > Résumé files are written to and read from the application's **local** disk

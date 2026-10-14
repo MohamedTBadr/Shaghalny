@@ -41,4 +41,8 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'pdftotext' => [
+        'binary' => env('PDFTOTEXT_BINARY'),
+    ],
+
 ];

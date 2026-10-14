@@ -141,24 +141,12 @@ class ResumeAnalysisService
 
         file_put_contents($tempFile, $pdfContent);
 
-        // Check if pdf to text installed
-
-        $pdfToTextPath = ['/usr/bin/pdftotext'];
-        $pdfToTextAvailable = false;
-        foreach ($pdfToTextPath as $path) {
-            if (file_exists($path)) {
-                $pdfToTextAvailable = true;
-                break;
-            }
-        }
-
-        if (! $pdfToTextAvailable) {
-            throw new \Exception('pdf to text is not installed');
-        }
-
         // endregion
-        // Extracted Text
-        $text = (new Pdf)->setPdf($tempFile)->text();
+        // Extracted Text (Spatie auto-detects the pdftotext binary; override via
+        // PDFTOTEXT_BINARY env / services.pdftotext.binary config when needed).
+        $binary = config('services.pdftotext.binary') ?: null;
+
+        $text = (new Pdf($binary))->setPdf($tempFile)->text();
 
         unlink($tempFile);
 

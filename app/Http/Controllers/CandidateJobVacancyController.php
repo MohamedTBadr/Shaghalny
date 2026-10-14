@@ -91,11 +91,20 @@ class CandidateJobVacancyController extends Controller
         } else {
             $resumeId = $request->input('resume_option');
             $resume = Resume::where('user_id', auth()->id())->findOrFail($resumeId);
-            $extractedInfo = ['summary' => '',
-                'education' => '',
-                'skills' => '',
-                'experience' => ''];
 
+            $extractedInfo = [
+                'summary' => $resume->summary,
+                'education' => $resume->education,
+                'skills' => $resume->skills,
+                'experience' => $resume->experience,
+            ];
+
+            // Fallback: if this resume was stored before its contents were parsed
+            // (or parsing failed), extract them now and persist them.
+            if (trim(implode('', array_map('strval', $extractedInfo))) === '') {
+                $extractedInfo = $this->resumeAnalysisService->extractResumeInfromation($resume->fileUrl);
+                $resume->update($extractedInfo);
+            }
         }
         // TODO Evaluate Job App
         $evalution = $this->resumeAnalysisService->analyzeResume($jobVacancy, $extractedInfo);
